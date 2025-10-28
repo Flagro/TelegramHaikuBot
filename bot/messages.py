@@ -13,10 +13,3 @@ class Messages:
     )
 
     STOP_MESSAGE = "Goodbye! Use /start if you want to chat again."
-
-    # Haiku detection
-    HAIKU_DETECTED_PREFIX = "✨ Haiku detected! ✨\n\n"
-
-    # Log messages
-    LOG_BOT_STARTED = "Bot started"
-    LOG_HAIKU_DETECTED = "Haiku detected from user {username}"

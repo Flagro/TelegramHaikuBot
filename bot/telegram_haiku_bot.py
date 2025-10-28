@@ -49,7 +49,7 @@ class TelegramHaikuBot:
             MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message)
         )
 
-        self.logger.info(Messages.LOG_BOT_STARTED)
+        self.logger.info("Bot started")
         application.run_polling()
 
     async def start_command(
@@ -83,7 +83,7 @@ class TelegramHaikuBot:
                 parse_mode=ParseMode.MARKDOWN,
             )
             self.logger.info(
-                Messages.LOG_HAIKU_DETECTED.format(
+                "Haiku detected from user {username}".format(
                     username=update.message.from_user.username
                 )
             )
