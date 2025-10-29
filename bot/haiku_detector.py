@@ -44,9 +44,57 @@ def count_line_syllables(line: str) -> int:
     return sum(count_syllables(word) for word in words)
 
 
+def find_haiku_splits(words: list[str]) -> list[str] | None:
+    """
+    Try to find a valid 5-7-5 split of the words into 3 lines.
+
+    Args:
+        words: List of words to split
+
+    Returns:
+        A list of 3 lines if a valid haiku split is found, None otherwise
+    """
+    if len(words) < 3:
+        return None
+
+    # Try all possible ways to split words into 3 lines
+    # Line 1: words[0:i], Line 2: words[i:j], Line 3: words[j:]
+    for i in range(1, len(words)):
+        line1_words = words[:i]
+        line1 = " ".join(line1_words)
+        line1_syllables = count_line_syllables(line1)
+
+        # Early exit if line 1 doesn't have 5 syllables
+        if line1_syllables != 5:
+            continue
+
+        for j in range(i + 1, len(words) + 1):
+            line2_words = words[i:j]
+            line2 = " ".join(line2_words)
+            line2_syllables = count_line_syllables(line2)
+
+            # Early exit if line 2 doesn't have 7 syllables
+            if line2_syllables != 7:
+                continue
+
+            line3_words = words[j:]
+            line3 = " ".join(line3_words)
+            line3_syllables = count_line_syllables(line3)
+
+            # Check if line 3 has 5 syllables
+            if line3_syllables == 5:
+                return [line1, line2, line3]
+
+    return None
+
+
 def detect_haiku(text: str) -> tuple[bool, list[str] | None]:
     """
     Detect if the text contains a haiku (5-7-5 syllable pattern).
+
+    This function can detect haikus in two ways:
+    1. Text explicitly split into 3 lines with newlines
+    2. Continuous text that can be split into a 5-7-5 pattern
 
     Args:
         text: The text to check for haiku
@@ -56,18 +104,29 @@ def detect_haiku(text: str) -> tuple[bool, list[str] | None]:
         - is_haiku: True if text is a haiku
         - lines: The three lines if it's a haiku, None otherwise
     """
-    # Split by newlines and filter empty lines
-    lines = [line.strip() for line in text.strip().split("\n") if line.strip()]
-
-    # A haiku must have exactly 3 lines
-    if len(lines) != 3:
+    text = text.strip()
+    if not text:
         return False, None
 
-    # Count syllables for each line
-    syllable_counts = [count_line_syllables(line) for line in lines]
+    # First, try to detect haiku with explicit line breaks
+    lines = [line.strip() for line in text.split("\n") if line.strip()]
 
-    # Check if it matches the 5-7-5 pattern
-    if syllable_counts == [5, 7, 5]:
-        return True, lines
+    if len(lines) == 3:
+        syllable_counts = [count_line_syllables(line) for line in lines]
+        if syllable_counts == [5, 7, 5]:
+            return True, lines
+
+    # If not found with explicit lines, try to find haiku in continuous text
+    # Extract all words from the text
+    words = re.findall(r"\b\w+\b", text)
+
+    if len(words) < 3:
+        return False, None
+
+    # Try to find a valid 5-7-5 split
+    haiku_lines = find_haiku_splits(words)
+
+    if haiku_lines:
+        return True, haiku_lines
 
     return False, None
