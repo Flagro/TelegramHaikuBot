@@ -5,19 +5,22 @@ def count_syllables(word: str) -> int:
     """
     Count syllables in a word using a simple algorithm.
     This is a basic implementation and may not be perfect.
+    Supports Latin (with diacritics), Cyrillic, and mixed text.
     """
     word = word.lower().strip()
     if not word:
         return 0
 
-    # Remove non-alphabetic characters
-    word = re.sub(r"[^a-z]", "", word)
+    # Remove non-alphabetic characters (keep Latin, Cyrillic, and diacritics)
+    # Keep: a-z, Latin with diacritics (À-ÿ), Cyrillic (Ё, ё, А-я)
+    word = re.sub(r"[^a-zà-ÿёа-я]", "", word)
 
     if len(word) <= 3:
         return 1
 
     # Count vowel groups
-    vowels = "aeiouy"
+    # Latin vowels (including common diacritics) + Cyrillic vowels
+    vowels = "aeiouyàáâãäåèéêëìíîïòóôõöùúûüýÿаеёиоуыэюя"
     syllable_count = 0
     previous_was_vowel = False
 
@@ -27,11 +30,11 @@ def count_syllables(word: str) -> int:
             syllable_count += 1
         previous_was_vowel = is_vowel
 
-    # Adjust for silent 'e' at the end
+    # Adjust for silent 'e' at the end (Latin languages only)
     if word.endswith("e") and syllable_count > 1:
         syllable_count -= 1
 
-    # Adjust for 'le' at the end
+    # Adjust for 'le' at the end (Latin languages only)
     if word.endswith("le") and len(word) > 2 and word[-3] not in vowels:
         syllable_count += 1
 
@@ -40,7 +43,8 @@ def count_syllables(word: str) -> int:
 
 def count_line_syllables(line: str) -> int:
     """Count total syllables in a line of text."""
-    words = re.findall(r"\b\w+\b", line)
+    # Match words containing Latin (with diacritics), Cyrillic, or mixed
+    words = re.findall(r"[a-zà-ÿёа-я]+", line, re.IGNORECASE)
     return sum(count_syllables(word) for word in words)
 
 
@@ -117,8 +121,8 @@ def detect_haiku(text: str) -> tuple[bool, list[str] | None]:
             return True, lines
 
     # If not found with explicit lines, try to find haiku in continuous text
-    # Extract all words from the text
-    words = re.findall(r"\b\w+\b", text)
+    # Extract all words from the text (Latin with diacritics, Cyrillic, or mixed)
+    words = re.findall(r"[a-zà-ÿёа-я]+", text, re.IGNORECASE)
 
     if len(words) < 3:
         return False, None
