@@ -96,10 +96,6 @@ def detect_haiku(text: str) -> tuple[bool, list[str] | None]:
     """
     Detect if the text contains a haiku (5-7-5 syllable pattern).
 
-    This function can detect haikus in two ways:
-    1. Text explicitly split into 3 lines with newlines
-    2. Continuous text that can be split into a 5-7-5 pattern
-
     Args:
         text: The text to check for haiku
 
@@ -112,17 +108,11 @@ def detect_haiku(text: str) -> tuple[bool, list[str] | None]:
     if not text:
         return False, None
 
-    # First, try to detect haiku with explicit line breaks
-    lines = [line.strip() for line in text.split("\n") if line.strip()]
+    # Normalize all whitespace (including newlines) to single spaces
+    normalized_text = re.sub(r"\s+", " ", text)
 
-    if len(lines) == 3:
-        syllable_counts = [count_line_syllables(line) for line in lines]
-        if syllable_counts == [5, 7, 5]:
-            return True, lines
-
-    # If not found with explicit lines, try to find haiku in continuous text
-    # Extract all words from the text (Latin with diacritics, Cyrillic, or mixed)
-    words = re.findall(r"[a-zà-ÿёа-я]+", text, re.IGNORECASE)
+    # Extract all words from the normalized text
+    words = re.findall(r"[a-zà-ÿёа-я]+", normalized_text, re.IGNORECASE)
 
     if len(words) < 3:
         return False, None
