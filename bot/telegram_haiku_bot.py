@@ -56,6 +56,16 @@ class TelegramHaikuBot:
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
         """Handle the /start command."""
+        # Check if user is an admin
+        if self.admin_handles and not self._is_admin(update):
+            await update.message.reply_text(
+                "Sorry, only administrators can start this bot."
+            )
+            self.logger.warning(
+                f"Unauthorized start attempt by user {update.message.from_user.username}"
+            )
+            return
+
         await update.message.reply_text(Messages.START_MESSAGE)
 
     async def stop_command(
@@ -69,6 +79,13 @@ class TelegramHaikuBot:
     ) -> None:
         """Handle incoming messages and detect haikus."""
         if not update.message or not update.message.text:
+            return
+
+        # Check if user is allowed to use the bot
+        if self.allowed_handles and not self._is_allowed(update):
+            self.logger.debug(
+                f"Message from unauthorized user {update.message.from_user.username} ignored"
+            )
             return
 
         text = update.message.text
@@ -87,3 +104,21 @@ class TelegramHaikuBot:
                     username=update.message.from_user.username
                 )
             )
+
+    def _is_admin(self, update: Update) -> bool:
+        """Check if the user is an admin."""
+        if not update.message or not update.message.from_user:
+            return False
+
+        username = update.message.from_user.username
+        handle = "@" + username if username else None
+        return handle in self.admin_handles if handle else False
+
+    def _is_allowed(self, update: Update) -> bool:
+        """Check if the user is allowed to use the bot."""
+        if not update.message or not update.message.from_user:
+            return False
+
+        username = update.message.from_user.username
+        handle = "@" + username if username else None
+        return handle in self.allowed_handles if handle else False
