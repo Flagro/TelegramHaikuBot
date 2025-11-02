@@ -56,8 +56,12 @@ class TelegramHaikuBot:
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
         """Handle the /start command."""
-        # Check if user is an admin
-        if self.admin_handles and not self._is_admin(update):
+        # Check if user is an admin (if admin list is configured, empty/None = allow all)
+        if (
+            self.admin_handles
+            and len(self.admin_handles) > 0
+            and not self._is_admin(update)
+        ):
             await update.message.reply_text(
                 "Sorry, only administrators can start this bot."
             )
@@ -81,8 +85,12 @@ class TelegramHaikuBot:
         if not update.message or not update.message.text:
             return
 
-        # Check if user is allowed to use the bot
-        if self.allowed_handles and not self._is_allowed(update):
+        # Check if user is allowed to use the bot (if allowed list is configured, empty/None = allow all)
+        if (
+            self.allowed_handles
+            and len(self.allowed_handles) > 0
+            and not self._is_allowed(update)
+        ):
             self.logger.debug(
                 f"Message from unauthorized user {update.message.from_user.username} ignored"
             )
