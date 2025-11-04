@@ -20,10 +20,20 @@ class Messages:
 
     STOP_MESSAGE = "Bot deactivated. Use /start to reactivate."
 
-    MODE_CHANGED_STRICT = "🔧 Detection mode set to: *STRICT*\n\nI'll only detect haikus if your entire message is exactly a haiku with no extra text."
+    MODE_CHANGED_STRICT = (
+        "🔧 Detection mode set to: *STRICT*\n\n"
+        "I'll only detect haikus if your entire message is exactly a haiku with no extra text."
+    )
+    MODE_CHANGED_RANDOM = (
+        "🔧 Detection mode set to: *RANDOM*\n\n"
+        "I'll search for haikus in your messages and return one random haiku if multiple are found."
+    )
 
-    MODE_CHANGED_RANDOM = "🔧 Detection mode set to: *RANDOM*\n\nI'll search for haikus in your messages and return one random haiku if multiple are found."
-
-    MODE_PROMPT = "🎛️ *Current mode: {mode}*\n\nChoose a detection mode:\n\n🎯 *STRICT* - Only exact haikus (no extra text)\n🎲 *RANDOM* - Find haikus in text, return random one"
+    MODE_PROMPT = (
+        "🎛️ *Current mode: {mode}*\n\n"
+        "Choose a detection mode:\n\n"
+        "🎯 *STRICT* - Only exact haikus (no extra text)\n"
+        "🎲 *RANDOM* - Find haikus in text, return random one"
+    )
 
     BOT_NOT_ACTIVE = "Bot is not active in this chat. Use /start to activate."
