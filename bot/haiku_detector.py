@@ -97,7 +97,7 @@ def find_haiku_splits(
     return None
 
 
-def detect_haiku(text: str) -> tuple[bool, list[str] | None]:
+def detect_haiku_strict(text: str) -> list[str] | None:
     """
     Detect if the text contains a haiku (5-7-5 syllable pattern).
     Searches through the entire text using a sliding window approach
@@ -107,13 +107,11 @@ def detect_haiku(text: str) -> tuple[bool, list[str] | None]:
         text: The text to check for haiku
 
     Returns:
-        A tuple of (is_haiku, lines) where:
-        - is_haiku: True if text contains a haiku
-        - lines: The three lines of the first haiku found, None otherwise
+        A list of three lines if a haiku is found, None otherwise
     """
     text = text.strip()
     if not text:
-        return False, None
+        return None
 
     # Normalize all whitespace (including newlines) to single spaces
     normalized_text = re.sub(r"\s+", " ", text)
@@ -122,52 +120,16 @@ def detect_haiku(text: str) -> tuple[bool, list[str] | None]:
     words = re.findall(r"[a-zà-ÿёа-я]+", normalized_text, re.IGNORECASE)
 
     if len(words) < 3:
-        return False, None
+        return None
 
     # Try to find a valid 5-7-5 split starting from each position
     for start_idx in range(len(words)):
         result = find_haiku_splits(words, start_idx)
         if result:
             haiku_lines, _, _ = result
-            return True, haiku_lines
+            return haiku_lines
 
-    return False, None
-
-
-def detect_haiku_strict(text: str) -> tuple[bool, list[str] | None]:
-    """
-    Detect if the ENTIRE text is exactly a haiku with no extra words.
-
-    Args:
-        text: The text to check
-
-    Returns:
-        A tuple of (is_haiku, lines) where:
-        - is_haiku: True if entire text is exactly a haiku
-        - lines: The three lines if it's a haiku, None otherwise
-    """
-    text = text.strip()
-    if not text:
-        return False, None
-
-    # Normalize all whitespace (including newlines) to single spaces
-    normalized_text = re.sub(r"\s+", " ", text)
-
-    # Extract all words from the normalized text
-    words = re.findall(r"[a-zà-ÿёа-я]+", normalized_text, re.IGNORECASE)
-
-    if len(words) < 3:
-        return False, None
-
-    # Try to find a haiku that uses ALL words (starting at 0)
-    result = find_haiku_splits(words, 0)
-    if result:
-        haiku_lines, start_idx, end_idx = result
-        # Check if the haiku uses ALL the words (no extra words before or after)
-        if start_idx == 0 and end_idx == len(words):
-            return True, haiku_lines
-
-    return False, None
+    return None
 
 
 def detect_all_haikus(text: str) -> list[list[str]]:

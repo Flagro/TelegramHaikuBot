@@ -11,7 +11,7 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 
-from bot.haiku_detector import detect_haiku, detect_haiku_strict, detect_all_haikus
+from bot.haiku_detector import detect_haiku_strict, detect_all_haikus
 from bot.haiku_formatter import format_haiku
 from bot.messages import Messages
 from bot.chat_state import ChatStateManager, DetectionMode
@@ -189,9 +189,9 @@ class TelegramHaikuBot:
 
         if detection_mode == DetectionMode.STRICT:
             # STRICT mode: Only detect if entire message is exactly a haiku
-            is_haiku, lines = detect_haiku_strict(text)
+            lines = detect_haiku_strict(text)
 
-            if is_haiku:
+            if lines:
                 formatted_haiku = format_haiku(lines)
                 response = f"{Messages.HAIKU_DETECTED_PREFIX}{formatted_haiku}"
 
