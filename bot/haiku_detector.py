@@ -1,4 +1,5 @@
 import re
+import random
 
 
 def count_syllables(word: str) -> int:
@@ -172,3 +173,13 @@ def detect_all_haikus(text: str) -> list[list[str]]:
             start_idx += 1
 
     return haikus
+
+
+def detect_random_haiku(text: str) -> list[str] | None:
+    """
+    Detect a random haiku (5-7-5 syllable pattern) in the text.
+    """
+    all_haikus = detect_all_haikus(text)
+    if not all_haikus:
+        return None
+    return random.choice(all_haikus)
