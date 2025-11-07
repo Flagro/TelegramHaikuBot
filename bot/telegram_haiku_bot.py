@@ -1,5 +1,4 @@
 import logging
-import random
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
@@ -11,7 +10,7 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 
-from bot.haiku_detector import detect_haiku_strict, detect_all_haikus
+from bot.haiku_detector import detect_haiku_strict, detect_random_haiku
 from bot.haiku_formatter import format_haiku
 from bot.messages import Messages
 from bot.chat_state import ChatStateManager, DetectionMode
@@ -204,11 +203,9 @@ class TelegramHaikuBot:
                 )
         else:
             # RANDOM mode: Find all haikus and return one random one
-            haikus = detect_all_haikus(text)
+            selected_haiku = detect_random_haiku(text)
 
-            if haikus:
-                # Pick one random haiku from all found
-                selected_haiku = random.choice(haikus)
+            if selected_haiku:
                 formatted_haiku = format_haiku(selected_haiku)
                 response = f"{Messages.HAIKU_DETECTED_PREFIX}{formatted_haiku}"
 
@@ -217,7 +214,7 @@ class TelegramHaikuBot:
                     parse_mode=ParseMode.MARKDOWN,
                 )
                 self.logger.info(
-                    f"Haiku detected (random mode, {len(haikus)} found) from user {update.message.from_user.username} in chat {chat_id}"
+                    f"Haiku detected (random mode) from user {update.message.from_user.username} in chat {chat_id}"
                 )
 
     def _is_admin(self, update: Update) -> bool:
